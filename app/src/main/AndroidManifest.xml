@@ -36,28 +36,33 @@
             android:exported="true"
             android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenSize|uiMode|locale|layoutDirection"
             android:windowSoftInputMode="stateAlwaysHidden">
-            <!-- Declares Wolvic as a browser app -->
+            <!-- Intent filters declaring Wolvic as a browser app REMOVED -->
+            <!-- <intent-filter> -->
+            <!--     <action android:name="android.intent.action.VIEW" /> -->
+            <!--     <category android:name="android.intent.category.BROWSABLE" /> -->
+            <!--     <category android:name="android.intent.category.DEFAULT" /> -->
+            <!--     <data android:scheme="https" /> -->
+            <!--     <data android:scheme="http" /> -->
+            <!-- </intent-filter> -->
+            <!-- Used for the special wolvic:// links REMOVED -->
+            <!-- <intent-filter> -->
+            <!--     <action android:name="android.intent.action.VIEW" /> -->
+            <!--     <category android:name="android.intent.category.DEFAULT" /> -->
+            <!--     <category android:name="android.intent.category.BROWSABLE" /> -->
+            <!--     <data -->
+            <!--         android:scheme="wolvic" -->
+            <!--         android:host="com.igalia.wolvic" /> -->
+            <!-- </intent-filter> -->
+            <!-- SEND intent filter REMOVED -->
+            <!-- <intent-filter> -->
+            <!--     <action android:name="android.intent.action.SEND" /> -->
+            <!--     <category android:name="android.intent.category.DEFAULT" /> -->
+            <!--     <data android:mimeType="text/plain"/> -->
+            <!-- </intent-filter> -->
+            <!-- Launcher intent filter - this makes the app appear in the launcher -->
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="https" />
-                <data android:scheme="http" />
-            </intent-filter>
-            <!-- Used for the special wolvic:// links -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="wolvic"
-                    android:host="com.igalia.wolvic" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <service

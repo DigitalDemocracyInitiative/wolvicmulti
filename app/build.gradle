@@ -86,23 +86,9 @@ def getMKApiKey = { ->
     return ""
 }
 
-def isChromiumAvailable = {
-    if (gradle.hasProperty("localProperties.chromium_aar")) {
-        return true
-    }
-    return false
-}
-
-def isWebKitAvailable = {
-    if (gradle.hasProperty("localProperties.webkit_aar")) {
-        return true
-    }
-    return false
-}
-
 // Version names for Gecko and Chromium releases.
-def GECKO_RELEASE_VERSION_NAME = '1.8.1'
-def CHROMIUM_RELEASE_VERSION_NAME = '1.2.1'
+// def GECKO_RELEASE_VERSION_NAME = '1.8.1' // Removed
+// def CHROMIUM_RELEASE_VERSION_NAME = '1.2.1' // Removed
 
 android {
     namespace 'com.igalia.wolvic'
@@ -167,7 +153,7 @@ android {
     packagingOptions {
         jniLibs {
             useLegacyPackaging = true
-            pickFirsts += ['**/libxul.so']
+            // pickFirsts += ['**/libxul.so'] // Removed: For Gecko
         }
     }
 
@@ -198,15 +184,15 @@ android {
 
     applicationVariants.configureEach { variant ->
         // Use different version names for release builds for each backend.
-        def backend = variant.productFlavors.get(2).name
+        // def backend = variant.productFlavors.get(2).name // Removed backend logic
         variant.outputs.each { output ->
-            if (variant.buildType.name == "release") {
-                if (backend == "gecko") {
-                    output.versionNameOverride = GECKO_RELEASE_VERSION_NAME
-                } else if (backend == "chromium") {
-                    output.versionNameOverride = CHROMIUM_RELEASE_VERSION_NAME
-                }
-            }
+            // if (variant.buildType.name == "release") { // Removed backend logic
+                // if (backend == "gecko") {
+                //     output.versionNameOverride = GECKO_RELEASE_VERSION_NAME
+                // } else if (backend == "chromium") {
+                //     output.versionNameOverride = CHROMIUM_RELEASE_VERSION_NAME
+                // }
+            // } // Removed backend logic
             if (shouldUseStaticVersionCode()) {
                 // Overrides any build created with a generated version code from now to 2115
                 output.versionCodeOverride = 1_99_365_2300
@@ -347,33 +333,33 @@ android {
         }
 
         // Supported Backends
-        gecko {
-            dimension "backend"
-            externalNativeBuild {
-                cmake {
-                    cppFlags " -DGECKO"
-                    arguments "-DGECKO=ON"
-                }
-            }
-            buildConfigField 'String', 'PROPS_ENDPOINT', '"https://igalia.github.io/wolvic/props.json"'
-        }
+        // gecko { // REMOVED
+        //     dimension "backend"
+        //     externalNativeBuild {
+        //         cmake {
+        //             cppFlags " -DGECKO"
+        //             arguments "-DGECKO=ON"
+        //         }
+        //     }
+        //     buildConfigField 'String', 'PROPS_ENDPOINT', '"https://igalia.github.io/wolvic/props.json"'
+        // }
 
-        chromium {
-            dimension "backend"
-            resValue "string", "app_name", "Wolvic Chromium"
-            externalNativeBuild {
-                cmake {
-                    cppFlags " -DCHROMIUM"
-                    arguments "-DCHROMIUM=ON"
-                }
-            }
-            buildConfigField "Boolean", "ENABLE_PAGE_ZOOM", "true"
-            buildConfigField 'String', 'PROPS_ENDPOINT', '"https://igalia.github.io/wolvic/props-chromium.json"'
-        }
+        // chromium { // REMOVED
+        //     dimension "backend"
+        //     resValue "string", "app_name", "Wolvic Chromium"
+        //     externalNativeBuild {
+        //         cmake {
+        //             cppFlags " -DCHROMIUM"
+        //             arguments "-DCHROMIUM=ON"
+        //         }
+        //     }
+        //     buildConfigField "Boolean", "ENABLE_PAGE_ZOOM", "true"
+        //     buildConfigField 'String', 'PROPS_ENDPOINT', '"https://igalia.github.io/wolvic/props-chromium.json"'
+        // }
 
-        webkit {
-            dimension "backend"
-        }
+        // webkit { // REMOVED
+        //     dimension "backend"
+        // }
 
         // Stores flavor
         generic {
@@ -406,8 +392,8 @@ android {
     variantFilter { variant ->
         def platform = variant.getFlavors().get(0).name
         def abi = variant.getFlavors().get(1).name
-        def backend = variant.getFlavors().get(2).name
-        def store = variant.getFlavors().get(3).name
+        // def backend = variant.getFlavors().get(2).name // Backend removed
+        def store = variant.getFlavors().get(2).name // store is now index 2
 
         // Create x64 variants only for noapi and aosp platforms
         if (abi == 'x64')
@@ -418,10 +404,10 @@ android {
             variant.setIgnore(true);
 
         // Create variants for chromium/webkit, only when they are available
-        if (backend == 'chromium' && !isChromiumAvailable())
-            variant.setIgnore(true);
-        if (backend == 'webkit' && !isWebKitAvailable())
-            variant.setIgnore(true);
+        // if (backend == 'chromium' && !isChromiumAvailable()) // REMOVED
+        //     variant.setIgnore(true);
+        // if (backend == 'webkit' && !isWebKitAvailable()) // REMOVED
+        //     variant.setIgnore(true);
 
         // MetaStore only apply to oculusvr builds.
         if (store == 'metaStore' && !platform.startsWith('oculusvr'))
@@ -436,7 +422,7 @@ android {
     androidComponents {
         onVariants(selector().all()) { variant ->
             def platform = variant.productFlavors.get(0).second
-            def store = variant.productFlavors.get(3).second
+            def store = variant.productFlavors.get(2).second // Adjusted index: backend dimension removed
 
             // Adjust the applicationId so it matches what the store expects.
             if (platform == "visionglass" && store == "generic") {
@@ -508,23 +494,23 @@ android {
             ]
         }
 
-        gecko {
-            java.srcDirs = [
-                    'src/common/gecko'
-            ]
-        }
+        // gecko { // REMOVED
+        //     java.srcDirs = [
+        //             'src/common/gecko'
+        //     ]
+        // }
 
-        chromium {
-            java.srcDirs = [
-                    'src/common/chromium'
-            ]
-        }
+        // chromium { // REMOVED
+        //     java.srcDirs = [
+        //             'src/common/chromium'
+        //     ]
+        // }
 
-        webkit {
-            java.srcDirs = [
-                    'src/common/webkit'
-            ]
-        }
+        // webkit { // REMOVED
+        //     java.srcDirs = [
+        //             'src/common/webkit'
+        //     ]
+        // }
     }
 
     sourceSets.configureEach { sourceSet ->
@@ -549,7 +535,7 @@ android {
 
 
     buildFeatures {
-        flavorDimensions = [ "platform", "abi", "backend", "store" ]
+        flavorDimensions = [ "platform", "abi", "store" ] // Removed "backend"
         viewBinding true
         prefab true // enable prefab support for various SDK AAR
         dataBinding true
@@ -595,33 +581,33 @@ dependencies {
     annotationProcessor libs.room.compiler
 
     // Android Components
-    implementation libs.androidcomponents.browser.errorpages
-    implementation libs.androidcomponents.browser.state
-    implementation libs.androidcomponents.browser.storage
-    implementation libs.androidcomponents.browser.domains
-    implementation libs.androidcomponents.browser.icons
-    implementation libs.androidcomponents.feature.findinpage
-    implementation libs.androidcomponents.feature.search
-    implementation libs.androidcomponents.feature.toolbar
-    implementation libs.androidcomponents.feature.top.sites
-    implementation libs.androidcomponents.service.accounts
-    implementation libs.androidcomponents.service.sync.logins
-    implementation libs.androidcomponents.mozilla.service.location
-    implementation libs.androidcomponents.ui.autocomplete
-    implementation libs.androidcomponents.concept.engine
-    implementation libs.androidcomponents.concept.fetch
-    implementation libs.androidcomponents.lib.fetch
-    implementation libs.androidcomponents.lib.dataprotect
-    implementation libs.androidcomponents.support.images
-    implementation libs.androidcomponents.support.rustlog
-    implementation libs.androidcomponents.support.rusthttp
-    implementation libs.androidcomponents.support.webextensions
-    implementation libs.androidcomponents.support.ktx
-    implementation libs.androidcomponents.feature.accounts
-    implementation libs.androidcomponents.feature.webcompat
-    implementation libs.androidcomponents.feature.webcompat.reporter
-    implementation libs.androidcomponents.feature.addons
-    implementation libs.support.preference
+    // REMOVED: implementation libs.androidcomponents.browser.errorpages
+    // REMOVED: implementation libs.androidcomponents.browser.state
+    // REMOVED: implementation libs.androidcomponents.browser.storage
+    // REMOVED: implementation libs.androidcomponents.browser.domains
+    // REMOVED: implementation libs.androidcomponents.browser.icons
+    // REMOVED: implementation libs.androidcomponents.feature.findinpage
+    // REMOVED: implementation libs.androidcomponents.feature.search
+    // REMOVED: implementation libs.androidcomponents.feature.toolbar
+    // REMOVED: implementation libs.androidcomponents.feature.top.sites
+    // REMOVED: implementation libs.androidcomponents.service.accounts
+    // REMOVED: implementation libs.androidcomponents.service.sync.logins
+    // REMOVED: implementation libs.androidcomponents.mozilla.service.location
+    // REMOVED: implementation libs.androidcomponents.ui.autocomplete
+    // REMOVED: implementation libs.androidcomponents.concept.engine
+    // REMOVED: implementation libs.androidcomponents.concept.fetch
+    // REMOVED: implementation libs.androidcomponents.lib.fetch
+    // REMOVED: implementation libs.androidcomponents.lib.dataprotect
+    implementation libs.androidcomponents.support.images // Kept for now, might be generic
+    // REMOVED: implementation libs.androidcomponents.support.rustlog
+    // REMOVED: implementation libs.androidcomponents.support.rusthttp
+    // REMOVED: implementation libs.androidcomponents.support.webextensions
+    implementation libs.androidcomponents.support.ktx // Kept for now, might be generic
+    // REMOVED: implementation libs.androidcomponents.feature.accounts
+    // REMOVED: implementation libs.androidcomponents.feature.webcompat
+    // REMOVED: implementation libs.androidcomponents.feature.webcompat.reporter
+    // REMOVED: implementation libs.androidcomponents.feature.addons
+    implementation libs.support.preference // Kept, could be used for app settings
 
     // Kotlin dependency
     implementation libs.kotlin.stdlib
@@ -648,8 +634,8 @@ dependencies {
     testImplementation libs.junit
     testImplementation libs.atsl.core
     testImplementation libs.robolectric
-    testImplementation libs.androidcomponents.support.test
-    testImplementation libs.androidcomponents.support.test.appservices
+    // testImplementation libs.androidcomponents.support.test // REMOVED
+    // testImplementation libs.androidcomponents.support.test.appservices // REMOVED
     jnaForTest libs.jna
     testImplementation files(configurations.jnaForTest.copyRecursive().files)
     testImplementation libs.work.testing
@@ -682,28 +668,28 @@ dependencies {
     visionglassImplementation libs.huawei.agconnect.core.harmony
     visionglassImplementation libs.huawei.hms.mlcomputervoiceasr
 
-    // gecko
-    def branch = "nightly" // "release", "nightly" or "beta"
-    geckoImplementation libs.geckoview."${branch}".x64
-    geckoImplementation libs.geckoview."${branch}".arm64
-    configurations.all {
-         resolutionStrategy.capabilitiesResolution.withCapability('org.mozilla.geckoview:geckoview') {
-            def abi = getName().toLowerCase().contains('x64') ? 'x86_64' : 'arm64'
-            def candidate = branch == "release" ? "geckoview-${abi}" : "geckoview-${branch}-${abi}"
-            select(candidates.find { it.id.module.contains(candidate) })
-        }
-    }
+    // gecko // ENTIRE SECTION REMOVED
+    // def branch = "nightly" // "release", "nightly" or "beta"
+    // geckoImplementation libs.geckoview."${branch}".x64
+    // geckoImplementation libs.geckoview."${branch}".arm64
+    // configurations.all {
+    //      resolutionStrategy.capabilitiesResolution.withCapability('org.mozilla.geckoview:geckoview') {
+    //         def abi = getName().toLowerCase().contains('x64') ? 'x86_64' : 'arm64'
+    //         def candidate = branch == "release" ? "geckoview-${abi}" : "geckoview-${branch}-${abi}"
+    //         select(candidates.find { it.id.module.contains(candidate) })
+    //     }
+    // }
 
-    // chromium
-    if (isChromiumAvailable()) {
-        chromiumImplementation fileTree(dir: gradle."localProperties.chromium_aar", include: ['*.aar'])
-        chromiumImplementation 'androidx.fragment:fragment:1.8.6'
-    }
+    // chromium // ENTIRE SECTION REMOVED
+    // if (isChromiumAvailable()) {
+    //     chromiumImplementation fileTree(dir: gradle."localProperties.chromium_aar", include: ['*.aar'])
+    //     chromiumImplementation 'androidx.fragment:fragment:1.8.6'
+    // }
 
-    // webkit
-    if (isWebKitAvailable()) {
-        webkitImplementation fileTree(dir: gradle."localProperties.webkit_aar", include: ['*.aar'])
-    }
+    // webkit // ENTIRE SECTION REMOVED
+    // if (isWebKitAvailable()) {
+    //     webkitImplementation fileTree(dir: gradle."localProperties.webkit_aar", include: ['*.aar'])
+    // }
 
     // openwnn (bundled because it is not published outside of JCenter, which is deprecated)
     implementation fileTree(dir: "${project.rootDir}/libs/openwnn/", include: ['*.aar'])
@@ -724,20 +710,21 @@ if (findProject(':servo')) {
     }
 }
 
-if (gradle.hasProperty('geckoViewLocalArm') || gradle.hasProperty('geckoViewLocalX86')) {
-    throw new GradleException("geckoViewLocal{Arm,X86} are deprecated: use geckoViewLocalTopsrcdir and geckoViewLocalTopobjdir")
-}
-
-if (gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopsrcdir')) {
-    if (getGradle().getStartParameter().getTaskRequests().toString().toLowerCase().contains('x64')
-            && gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopobjdirX64')) {
-        ext.topobjdir = gradle."localProperties.dependencySubstitutions.geckoviewTopobjdirX64"
-    } else if (gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopobjdir')) {
-        ext.topobjdir = gradle."localProperties.dependencySubstitutions.geckoviewTopobjdir"
-    }
-    ext.topsrcdir = gradle."localProperties.dependencySubstitutions.geckoviewTopsrcdir"
-    apply from: "${topsrcdir}/substitute-local-geckoview.gradle"
-}
+// REMOVED GeckoView local build logic
+// if (gradle.hasProperty('geckoViewLocalArm') || gradle.hasProperty('geckoViewLocalX86')) {
+//     throw new GradleException("geckoViewLocal{Arm,X86} are deprecated: use geckoViewLocalTopsrcdir and geckoViewLocalTopobjdir")
+// }
+//
+// if (gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopsrcdir')) {
+//     if (getGradle().getStartParameter().getTaskRequests().toString().toLowerCase().contains('x64')
+//             && gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopobjdirX64')) {
+//         ext.topobjdir = gradle."localProperties.dependencySubstitutions.geckoviewTopobjdirX64"
+//     } else if (gradle.hasProperty('localProperties.dependencySubstitutions.geckoviewTopobjdir')) {
+//         ext.topobjdir = gradle."localProperties.dependencySubstitutions.geckoviewTopobjdir"
+//     }
+//     ext.topsrcdir = gradle."localProperties.dependencySubstitutions.geckoviewTopsrcdir"
+//     apply from: "${topsrcdir}/substitute-local-geckoview.gradle"
+// }
 
 // -------------------------------------------------------------------------------------------------
 // MLS: Read token from local file if it exists
@@ -753,7 +740,7 @@ android.applicationVariants.configureEach { variant ->
     }
 
     def platform = variant.productFlavors.get(0).name
-    def store = variant.productFlavors.get(3).name
+    def store = variant.productFlavors.get(2).name // Adjusted index: backend dimension removed
 
     // Default homepages and voice recognition services for China releases.
     // HVR packages for mainland china must only use HVR speech recognition system.
